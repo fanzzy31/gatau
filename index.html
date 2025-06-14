@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Musik Player dengan Playlist</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }.container {
+  background-color: #1e1e1e;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0, 230, 118, 0.5);
+  text-align: center;
+  width: 90%;
+  max-width: 800px;
+  height: 70vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.container::before,
+.container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(180deg, #00e676, #00c853);
+  box-shadow: 0 0 30px #00e676;
+}
+
+.container::before {
+  left: -35px;
+}
+
+.container::after {
+  right: -35px;
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: #00e676;
+}
+
+label.custom-file-upload {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #00e676;
+  color: #000;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+label.custom-file-upload:hover {
+  background-color: #00c853;
+}
+
+#fileInput {
+  display: none;
+}
+
+.info-text {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.subtext {
+  font-style: italic;
+  color: #aaa;
+}
+
+audio {
+  margin-top: 20px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+#playlist {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #333;
+  border-radius: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #00e676 #1e1e1e;
+}
+
+#playlist li {
+  padding: 12px;
+  background: #2a2a2a;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#playlist li:hover {
+  background-color: #333;
+}
+
+#playlist li:last-child {
+  border-bottom: none;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#sortButton {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.creator {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #888;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 Musik Player dengan Playlist</h1>
+    <label for="fileInput" class="custom-file-upload">➕ Tambah Musik</label>
+    <input type="file" id="fileInput" multiple accept="audio/*">
+    <div class="info-text">Belum ada musik</div>
+    <div class="subtext">Tidak ada lagu diputar</div>
+    <audio id="audioPlayer" controls></audio>
+    <ul id="playlist"></ul>
+    <button id="sortButton">Urutkan Playlist</button>
+    <div class="creator">Creator: Fatur</div>
+  </div>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const infoText = document.querySelector('.info-text');
+    const subtext = document.querySelector('.subtext');
+    const playlist = document.getElementById('playlist');
+    const sortButton = document.getElementById('sortButton');let files = [];
+
+function updatePlaylist() {
+  playlist.innerHTML = '';
+  files.forEach((file, index) => {
+    const li = document.createElement('li');
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = file.name;
+    nameSpan.style.flex = '1';
+    const deleteBtn = document.createElement('button');
+    deleteBtn.innerHTML = '🗑️';
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      files.splice(index, 1);
+      updatePlaylist();
+    });
+    li.appendChild(nameSpan);
+    li.appendChild(deleteBtn);
+    li.addEventListener('click', () => {
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
+      audioPlayer.play();
+      infoText.textContent = file.name;
+      subtext.textContent = 'Lagu sedang diputar';
+    });
+    playlist.appendChild(li);
+  });
+}
+
+fileInput.addEventListener('change', function () {
+  const newFiles = Array.from(this.files);
+  const existingNames = files.map(f => f.name);
+  newFiles.forEach(file => {
+    if (!existingNames.includes(file.name)) {
+      files.push(file);
+    }
+  });
+  updatePlaylist();
+});
+
+sortButton.addEventListener('click', () => {
+  files.sort((a, b) => a.name.localeCompare(b.name));
+  updatePlaylist();
+});
+
+  </script>
+</body>
+</html>
